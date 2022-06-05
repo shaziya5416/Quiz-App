@@ -21,6 +21,31 @@ export default class SingleQuizQuestion extends Component {
             options : arrOfAllAnswers,
             correctAnswer:correctAnswer        })
     }
+    componentDidUpdate(prevProps, prevState) {
+        if (prevState.currentQuestion !== this.state.currentQuestion) {
+            let arrOfIncorrect=[
+                ...this.props.questions[this.state.currentQuestion].incorrect_answers,
+            ];
+            let correctAnswer=this.props.questions[this.state.currentQuestion].correct_answer;
+            let arrOfAllAnswers= _.unique(_.concat(arrOfIncorrect,correctAnswer));
+    
+            this.setState({
+                options : arrOfAllAnswers,
+                correctAnswer:correctAnswer        })
+        }
+      }
+      handleNextQuestion = () => {
+        if (!this.props.arrOfSelectedAnswer[this.state.currentQuestion]) {
+          alert("You must select answer of current question.");
+        } else {
+          this.setState((prevState) => {
+            return {
+              currentQuestion: prevState.currentQuestion + 1,
+            };
+          });
+        }
+      };
+    
 
   render() {
     let questionToDisplay=this.props.questions[this.state.currentQuestion];
@@ -49,7 +74,7 @@ export default class SingleQuizQuestion extends Component {
                 <ul className="ans">
                     {this.state.options.map((answer,i)=>{
                         return(
-                            <li onclick={(event)=>{this.props.handleArrayOfSelectedAnswers(this.props.question,this.props.arrOfAllAnswers)}} key={i} className={this.props.allOptions[this.state.currentQuestion]===answer ? "green":"purple"}>
+                            <li onclick={(event)=>{this.props.handleArrayOfSelectedAnswers(this.props.questions,this.state.currentQuestion)}} key={i} className={this.props.arrOfSelectedAnswer[this.state.currentQuestion]===answer ? "green":"purple"}>
                                 {i+1} : {" "+ answer}
                             </li>
                         )
@@ -62,13 +87,13 @@ export default class SingleQuizQuestion extends Component {
         {this.state.currentQuestion>8?
         (
             <div>
-                <button className="next" onClick={(event)=>{this.props.handleSubmit(this.props.questions,this.props.allOptions)}}>
+                <button className="next" onClick={(event)=>{this.props.handleSubmit(this.props.questions,this.props.arrOfSelectedAnswer)}}>
                  Submit
                 </button>
             </div>
         ):(
             <div>
-                <button className="next" onClick={(event)=>{this.props.handleNextQuestion()}}>
+                <button className="next" onClick={(event)=>{this.handleNextQuestion()}}>
                     Next
                 </button>
             </div>
